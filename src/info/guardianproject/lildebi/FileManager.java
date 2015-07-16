@@ -39,18 +39,13 @@ public class FileManager extends ListActivity {
 		Adapter = new FilePickerListAdapter(this, Files);
 		setListAdapter(Adapter);
 		acceptedFileExtensions = new String[] {};
-
 		if(getIntent().hasExtra(EXTRA_FILE_PATH)) 
 			Directory = new File(getIntent().getStringExtra(EXTRA_FILE_PATH));
-
 		if(getIntent().hasExtra(EXTRA_SHOW_HIDDEN_FILES)) 
 			ShowHiddenFiles = getIntent().getBooleanExtra(EXTRA_SHOW_HIDDEN_FILES, false);
-
 		if(getIntent().hasExtra(EXTRA_ACCEPTED_FILE_EXTENSIONS)) {
-
 			ArrayList<String> collection = 
 					getIntent().getStringArrayListExtra(EXTRA_ACCEPTED_FILE_EXTENSIONS);
-
 			acceptedFileExtensions = (String[]) 
 					collection.toArray(new String[collection.size()]);
 		}
@@ -63,85 +58,61 @@ public class FileManager extends ListActivity {
 	}
 
 	protected void refreshFilesList() {
-
 		Files.clear();
 		ExtensionFilenameFilter filter = 
 				new ExtensionFilenameFilter(acceptedFileExtensions);
-
 		File[] files = Directory.listFiles(filter);
-
 		if(files != null && files.length > 0) {
-
 			for(File f : files) {
-
 				if(f.isHidden() && !ShowHiddenFiles) {
-
 					continue;
 				}
-
 				Files.add(f);
 			}
-
 			Collections.sort(Files, new FileComparator());
 		}
-
 		Adapter.notifyDataSetChanged();
 	}
 
 	@Override
 	public void onBackPressed() {
-
 		if(Directory.getParentFile() != null) {
-
 			Directory = Directory.getParentFile();
 			refreshFilesList();
 			return;
 		}
-
 		super.onBackPressed();
 	}
 
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
-
 		File newFile = (File)l.getItemAtPosition(position);
-
 		if(newFile.isFile()) {
-
 			Intent extra = new Intent();
 			extra.putExtra(EXTRA_FILE_PATH, newFile.getAbsolutePath());
 			setResult(RESULT_OK, extra);
 			finish();
 		} 
 		else {
-
 			Directory = newFile;
 			refreshFilesList();
 		}
-
 		super.onListItemClick(l, v, position, id);
 	}
 
 	private class FilePickerListAdapter extends ArrayAdapter<File> {
-
 		private List<File> mObjects;
-
 		public FilePickerListAdapter(Context context, List<File> objects) {
-
 			super(context, R.layout.list_item, android.R.id.text1, objects);
 			mObjects = objects;
 		}
 
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
-
 			View row = null;
-
 			if(convertView == null) { 
-
 				LayoutInflater inflater = (LayoutInflater) 
 						getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
 				row = inflater.inflate(R.layout.list_item, parent, false);
 			} 
 			else 
@@ -156,7 +127,6 @@ public class FileManager extends ListActivity {
 
 			if(object.isFile()) 
 				imageView.setImageResource(R.drawable.file);
-
 			else 
 				imageView.setImageResource(R.drawable.folder);
 
@@ -182,7 +152,6 @@ public class FileManager extends ListActivity {
 		private String[] Extensions;
 
 		public ExtensionFilenameFilter(String[] extensions) {
-
 			super();
 			Extensions = extensions;
 		}
@@ -192,11 +161,8 @@ public class FileManager extends ListActivity {
 			if(new File(dir, filename).isDirectory()) {
 				return true;
 			}
-
 			if(Extensions != null && Extensions.length > 0) {
-
 				for(int i = 0; i < Extensions.length; i++) {
-
 					if(filename.endsWith(Extensions[i])) {
 						return true;
 					}
