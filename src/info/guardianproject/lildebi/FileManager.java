@@ -117,26 +117,21 @@ public class FileManager extends ListActivity {
 			} 
 			else 
 				row = convertView;
-
 			File object = mObjects.get(position);
-
 			ImageView imageView = (ImageView)row.findViewById(R.id.file_picker_image);
 			TextView textView = (TextView)row.findViewById(R.id.file_picker_text);
 			textView.setSingleLine(true);
 			textView.setText(object.getName());
-
 			if(object.isFile()) 
 				imageView.setImageResource(R.drawable.file);
 			else 
 				imageView.setImageResource(R.drawable.folder);
-
 			return row;
 		}
 	}
 
 	private class FileComparator implements Comparator<File> {
 		public int compare(File f1, File f2) {
-
 			if(f1 == f2) 
 				return 0; 
 			if(f1.isDirectory() && f2.isFile()) 
@@ -148,16 +143,13 @@ public class FileManager extends ListActivity {
 	}
 
 	private class ExtensionFilenameFilter implements FilenameFilter {
-
 		private String[] Extensions;
-
 		public ExtensionFilenameFilter(String[] extensions) {
 			super();
 			Extensions = extensions;
 		}
 
 		public boolean accept(File dir, String filename) {
-
 			if(new File(dir, filename).isDirectory()) {
 				return true;
 			}
