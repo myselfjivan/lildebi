@@ -2,15 +2,20 @@ package info.guardianproject.lildebi;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
+import java.util.Properties;
 import java.util.Scanner;
 
 import android.content.Context;
@@ -28,6 +33,7 @@ public class NativeHelper {
     public static File app_bin;
     public static File app_log;
     public static File install_log;
+    public static File app_profiles;
     public static File publicFiles;
     public static File sh;
     public static File install_conf;
@@ -43,10 +49,24 @@ public class NativeHelper {
     public static boolean isInstallRunning = false;
     public static boolean installInInternalStorage;
     public static boolean limitTo4GB;
+    
+    public static File file;
+    public static String profileName;
+    public static String generatedFileName;
+    public static List<String> myProfileList = new ArrayList<String>();
+    public static List<String> myGenProfileList = new ArrayList<String>();
+	public static String DIRECTORY_PATH = "/data/data/info.guardianproject.lildebi/app_profiles";
+	public static String Name;
+	public static String path_to_install_script;
+	public static String path_to_pre_start_script;
+	public static String path_to_post_start_script;
+	public static String gui_support;
+	public static String fileName;
 
     public static void setup(Context context) {
         app_bin = context.getDir("bin", Context.MODE_PRIVATE).getAbsoluteFile();
         app_log = context.getDir("log", Context.MODE_PRIVATE).getAbsoluteFile();
+        app_profiles = context.getDir("profiles", Context.MODE_PRIVATE).getAbsoluteFile();
         install_log = new File(app_log, "install.log");
         // this is the same as android-8's getExternalFilesDir() but works on android-1
         publicFiles = new File(Environment.getExternalStorageDirectory(),
@@ -93,6 +113,81 @@ public class NativeHelper {
         installInInternalStorage = prefs.getBoolean(prefName, detectedInternalInstall);
         if (installInInternalStorage)
             NativeHelper.image_path = NativeHelper.mnt;
+        try {
+        	File folder = new File("/sdcard/profiles/");
+        	File[] listOfFiles = folder.listFiles();
+        	int countOfProfiles=0;
+        	for (File file : listOfFiles) {
+        		if (file.isFile()) {
+        			profileName = file.getName();
+        			myProfileList.add(profileName);
+        			Log.d("all profiles ", profileName);
+        			countOfProfiles++;
+        		}
+        	}
+        	String n[] = new String[countOfProfiles];
+        	for (int i = 0; i < countOfProfiles; i++) {
+        		n[i] = myProfileList.get(i) ;
+        		Log.d("[i] value", n[i]);
+        		Log.d("No. of profiles", ""+countOfProfiles);
+        		Log.d("printing data for ", ""+n[i]);
+        		file = new File("/sdcard/profiles/" + n[i]);
+        		Log.d("file name", file.getPath());
+        		Properties prop = new Properties();
+        		InputStream input = null;
+        		try {
+        			input = new FileInputStream(file);
+        			prop.load(input);
+        			Name = prop.getProperty("Name");
+        			path_to_install_script = prop.getProperty("path_to_install_script");
+        			path_to_install_script = prop.getProperty("path_to_pre_start_script");
+        			path_to_post_start_script = prop.getProperty("path_to_post_start_script");
+        			gui_support = prop.getProperty("gui_support");
+        			Log.d("Name", Name);
+        			File root = new File(DIRECTORY_PATH);
+        			fileName = Name + ".sh";
+        			File gpxfile = new File(root, fileName);
+        			FileWriter writer;
+        			writer = new FileWriter(gpxfile);
+        			StringBuilder s = new StringBuilder();
+        			s.append("export TERM=linux \n");
+        			s.append("export HOME=/root \n");
+        			s.append("export PATH=$app_bin:/usr/bin:/usr/sbin:/bin:/sbin:$PATH \n");
+        			s.append("apt-get install "+ Name);
+
+        			writer.append(s);
+        			writer.flush();
+        			writer.close();
+
+        			Log.d("Name", Name);
+        			Log.d("path_to_install_script", path_to_install_script);
+        			Log.d("path_to_install_script", path_to_install_script);
+        			Log.d("path_to_post_start_script", path_to_post_start_script);
+        			Log.d("gui_support", gui_support);
+        		} catch (IOException ex) {
+        			ex.printStackTrace();
+        		}         			
+        	}
+        }catch (Exception e) {
+        	e.printStackTrace();     
+        }
+        try {
+        	File folder = new File(DIRECTORY_PATH);
+        	File[] listOfFiles = folder.listFiles();
+        	int countOfGeneratedFiles =0;
+        	for (File file : listOfFiles) {
+        		if (file.isFile()) {
+        			generatedFileName = file.getName();
+        			myGenProfileList.add(generatedFileName);
+        			chmod(0755, new File(app_profiles, generatedFileName));
+        			Log.d("all generated files ", generatedFileName);
+        			countOfGeneratedFiles++;
+        		}
+        	}
+        	Log.d("countOfGeneratedFiles", ""+countOfGeneratedFiles);
+        } catch (Exception e) {
+        	e.printStackTrace();
+        }
     }
 
     public static boolean isStarted() {
