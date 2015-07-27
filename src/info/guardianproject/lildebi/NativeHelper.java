@@ -34,6 +34,7 @@ public class NativeHelper {
     public static File app_log;
     public static File install_log;
     public static File app_profiles;
+    public static File app_usergenprofiles;
     public static File publicFiles;
     public static File sh;
     public static File install_conf;
@@ -56,6 +57,8 @@ public class NativeHelper {
     public static List<String> myProfileList = new ArrayList<String>();
     public static List<String> myGenProfileList = new ArrayList<String>();
 	public static String DIRECTORY_PATH = "/data/data/info.guardianproject.lildebi/app_profiles";
+	public static String USEGERGENPROFILES_PATH = "/data/data/info.guardianproject.lildebi/app_usergenprofiles/";
+	public static String exportPath = "export TERM=linux \nexport HOME=/root \nexport PATH=$app_bin:/usr/bin:/usr/sbin:/bin:/sbin:$PATH \n";
 	public static String Name;
 	public static String path_to_install_script;
 	public static String path_to_pre_start_script;
@@ -67,6 +70,7 @@ public class NativeHelper {
         app_bin = context.getDir("bin", Context.MODE_PRIVATE).getAbsoluteFile();
         app_log = context.getDir("log", Context.MODE_PRIVATE).getAbsoluteFile();
         app_profiles = context.getDir("profiles", Context.MODE_PRIVATE).getAbsoluteFile();
+        app_usergenprofiles = context.getDir("usergenprofiles", Context.MODE_PRIVATE).getAbsoluteFile();
         install_log = new File(app_log, "install.log");
         // this is the same as android-8's getExternalFilesDir() but works on android-1
         publicFiles = new File(Environment.getExternalStorageDirectory(),
@@ -102,7 +106,6 @@ public class NativeHelper {
         preStopScript = prefs.getString(
                 context.getString(R.string.pref_pre_stop_key),
                 context.getString(R.string.default_pre_stop_script));
-
         boolean detectedInternalInstall = false;
         /* attempt to auto-detect existing internal install */
         if (!isStarted()
@@ -113,8 +116,39 @@ public class NativeHelper {
         installInInternalStorage = prefs.getBoolean(prefName, detectedInternalInstall);
         if (installInInternalStorage)
             NativeHelper.image_path = NativeHelper.mnt;
+        
+        try{//writing default profiles
+        	Log.d("try block", "in try");
+        	File root = new File(USEGERGENPROFILES_PATH);
+        	File gpxfile = new File(root, "profile_ssh.txt");
+			FileWriter profilewriter = new FileWriter(gpxfile);
+			StringBuilder profilestring = new StringBuilder();
+			profilestring.append("Name = ssh \n path_to_install_script = /etc/bin \npath_to_pre_start_script = /etc/bin/1 \npath_to_post_start_script = /etc/bin/2 \ngui_support = no");
+			profilewriter.append(profilestring);
+			profilewriter.flush();
+			profilewriter.close();
+			
+        	File gpxfile1 = new File(root, "profile_apache2.txt");
+			FileWriter profilewriter1 = new FileWriter(gpxfile1);
+			StringBuilder profilestring1 = new StringBuilder();
+			profilestring1.append("Name = apache2 \n path_to_install_script = /etc/bin \npath_to_pre_start_script = /etc/bin/1 \npath_to_post_start_script = /etc/bin/2 \ngui_support = no");
+			profilewriter1.append(profilestring1);
+			profilewriter1.flush();
+			profilewriter1.close();
+			
+			File gpxfile2 = new File(root, "profile_wireshark.txt");
+			FileWriter profilewriter2 = new FileWriter(gpxfile2);
+			StringBuilder profilestring2 = new StringBuilder();
+			profilestring2.append("Name = wireshark \n path_to_install_script = /etc/bin \npath_to_pre_start_script = /etc/bin/1 \npath_to_post_start_script = /etc/bin/2 \ngui_support = no");
+			profilewriter2.append(profilestring2);
+			profilewriter2.flush();
+			profilewriter2.close();
+			
+        }catch (Exception e) {
+        	e.printStackTrace();     
+        }
         try {
-        	File folder = new File("/sdcard/profiles/");
+        	File folder = new File(USEGERGENPROFILES_PATH);
         	File[] listOfFiles = folder.listFiles();
         	int countOfProfiles=0;
         	for (File file : listOfFiles) {
@@ -131,7 +165,7 @@ public class NativeHelper {
         		Log.d("[i] value", n[i]);
         		Log.d("No. of profiles", ""+countOfProfiles);
         		Log.d("printing data for ", ""+n[i]);
-        		file = new File("/sdcard/profiles/" + n[i]);
+        		file = new File( USEGERGENPROFILES_PATH + n[i]);
         		Log.d("file name", file.getPath());
         		Properties prop = new Properties();
         		InputStream input = null;
@@ -143,17 +177,13 @@ public class NativeHelper {
         			path_to_install_script = prop.getProperty("path_to_pre_start_script");
         			path_to_post_start_script = prop.getProperty("path_to_post_start_script");
         			gui_support = prop.getProperty("gui_support");
-        			Log.d("Name", Name);
         			File root = new File(DIRECTORY_PATH);
         			fileName = Name + ".sh";
         			File gpxfile = new File(root, fileName);
-        			FileWriter writer;
-        			writer = new FileWriter(gpxfile);
+        			FileWriter writer = new FileWriter(gpxfile);
         			StringBuilder s = new StringBuilder();
-        			s.append("export TERM=linux \n");
-        			s.append("export HOME=/root \n");
-        			s.append("export PATH=$app_bin:/usr/bin:/usr/sbin:/bin:/sbin:$PATH \n");
-        			s.append("apt-get install "+ Name);
+        			s.append(exportPath);
+        			s.append("apt-get install -y "+ Name);
 
         			writer.append(s);
         			writer.flush();
