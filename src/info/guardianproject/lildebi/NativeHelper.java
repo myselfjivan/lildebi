@@ -56,15 +56,15 @@ public class NativeHelper {
     public static String generatedFileName;
     public static List<String> myProfileList = new ArrayList<String>();
     public static List<String> myGenProfileList = new ArrayList<String>();
-	public static String DIRECTORY_PATH = "/data/data/info.guardianproject.lildebi/app_profiles";
-	public static String USEGERGENPROFILES_PATH = "/data/data/info.guardianproject.lildebi/app_usergenprofiles/";
-	public static String exportPath = "export TERM=linux \nexport HOME=/root \nexport PATH=$app_bin:/usr/bin:/usr/sbin:/bin:/sbin:$PATH \n";
-	public static String Name;
-	public static String path_to_install_script;
-	public static String path_to_pre_start_script;
-	public static String path_to_post_start_script;
-	public static String gui_support;
-	public static String fileName;
+    public static String DIRECTORY_PATH = "/data/data/info.guardianproject.lildebi/app_profiles";
+    public static String USEGERGENPROFILES_PATH = "/data/data/info.guardianproject.lildebi/app_usergenprofiles/";
+    public static String exportPath = "export TERM=linux \nexport HOME=/root \nexport PATH=$app_bin:/usr/bin:/usr/sbin:/bin:/sbin:$PATH \n";
+    public static String Name;
+    public static String path_to_install_script;
+    public static String pre_start_script;
+    public static String post_start_script;
+    public static String gui_support;
+    public static String fileName;
 
     public static void setup(Context context) {
         app_bin = context.getDir("bin", Context.MODE_PRIVATE).getAbsoluteFile();
@@ -121,29 +121,29 @@ public class NativeHelper {
         	Log.d("try block", "in try");
         	File root = new File(USEGERGENPROFILES_PATH);
         	File gpxfile = new File(root, "profile_ssh.txt");
-			FileWriter profilewriter = new FileWriter(gpxfile);
-			StringBuilder profilestring = new StringBuilder();
-			profilestring.append("Name = ssh \n path_to_install_script = /etc/bin \npath_to_pre_start_script = /etc/bin/1 \npath_to_post_start_script = /etc/bin/2 \ngui_support = no");
-			profilewriter.append(profilestring);
-			profilewriter.flush();
-			profilewriter.close();
-			
+        	FileWriter profilewriter = new FileWriter(gpxfile);
+        	StringBuilder profilestring = new StringBuilder();
+        	profilestring.append("Name = ssh\n path_to_install_script = /etc/bin \npre_start_script =  \npost_start_script = /etc/bin/2 \ngui_support = no");
+        	profilewriter.append(profilestring);
+        	profilewriter.flush();
+        	profilewriter.close();
+
         	File gpxfile1 = new File(root, "profile_apache2.txt");
-			FileWriter profilewriter1 = new FileWriter(gpxfile1);
-			StringBuilder profilestring1 = new StringBuilder();
-			profilestring1.append("Name = apache2 \n path_to_install_script = /etc/bin \npath_to_pre_start_script = /etc/bin/1 \npath_to_post_start_script = /etc/bin/2 \ngui_support = no");
-			profilewriter1.append(profilestring1);
-			profilewriter1.flush();
-			profilewriter1.close();
-			
-			File gpxfile2 = new File(root, "profile_wireshark.txt");
-			FileWriter profilewriter2 = new FileWriter(gpxfile2);
-			StringBuilder profilestring2 = new StringBuilder();
-			profilestring2.append("Name = wireshark \n path_to_install_script = /etc/bin \npath_to_pre_start_script = /etc/bin/1 \npath_to_post_start_script = /etc/bin/2 \ngui_support = no");
-			profilewriter2.append(profilestring2);
-			profilewriter2.flush();
-			profilewriter2.close();
-			
+        	FileWriter profilewriter1 = new FileWriter(gpxfile1);
+        	StringBuilder profilestring1 = new StringBuilder();
+        	profilestring1.append("Name = apache2\n path_to_install_script = /etc/bin \npre_start_script = test1 \npost_start_script = /etc/bin/2 \ngui_support = no");
+        	profilewriter1.append(profilestring1);
+        	profilewriter1.flush();
+        	profilewriter1.close();
+
+        	File gpxfile2 = new File(root, "profile_wireshark.txt");
+        	FileWriter profilewriter2 = new FileWriter(gpxfile2);
+        	StringBuilder profilestring2 = new StringBuilder();
+        	profilestring2.append("Name = wireshark\n path_to_install_script = /etc/bin \npre_start_script = /etc/bin/1 \npost_start_script = /etc/bin/2 \ngui_support = yes");
+        	profilewriter2.append(profilestring2);
+        	profilewriter2.flush();
+        	profilewriter2.close();
+
         }catch (Exception e) {
         	e.printStackTrace();     
         }
@@ -174,25 +174,27 @@ public class NativeHelper {
         			prop.load(input);
         			Name = prop.getProperty("Name");
         			path_to_install_script = prop.getProperty("path_to_install_script");
-        			path_to_install_script = prop.getProperty("path_to_pre_start_script");
-        			path_to_post_start_script = prop.getProperty("path_to_post_start_script");
+        			pre_start_script = prop.getProperty("pre_start_script");
+        			post_start_script = prop.getProperty("post_start_script");
         			gui_support = prop.getProperty("gui_support");
         			File root = new File(DIRECTORY_PATH);
-        			fileName = Name + ".sh";
+        			fileName = Name+".sh";
         			File gpxfile = new File(root, fileName);
         			FileWriter writer = new FileWriter(gpxfile);
         			StringBuilder s = new StringBuilder();
         			s.append(exportPath);
-        			s.append("apt-get install -y "+ Name);
-
+        			s.append("apt-get install -y "+Name+"\n");
+        			s.append("sed -i '$ d' /etc/rc.local");
+        			s.append("echo '"+pre_start_script+"'>> /etc/rc.local");
+        			s.append("echo 'exit 0' > /etc/rc.local");
         			writer.append(s);
         			writer.flush();
         			writer.close();
 
         			Log.d("Name", Name);
         			Log.d("path_to_install_script", path_to_install_script);
-        			Log.d("path_to_install_script", path_to_install_script);
-        			Log.d("path_to_post_start_script", path_to_post_start_script);
+        			Log.d("pre_start_script", pre_start_script);
+        			Log.d("post_start_script", post_start_script);
         			Log.d("gui_support", gui_support);
         		} catch (IOException ex) {
         			ex.printStackTrace();
