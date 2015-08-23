@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -186,6 +187,20 @@ public class LilDebi extends Activity implements OnCreateContextMenuListener, On
                     startActivity(intent);
                 }
             return true;
+        case R.id.x_org_server:
+        	Intent xdsl = new Intent("x.org.server");
+        	xdsl.setComponent(new ComponentName("x.org.server","x.org.server.MainActivity"));
+        	 try {
+                 startActivity(xdsl);
+             } catch (ActivityNotFoundException e) {
+                 e.printStackTrace();
+                 Toast.makeText(this, R.string.x_server_xdsl_not_installed,
+                         Toast.LENGTH_LONG).show();
+                 Intent intent = new Intent(Intent.ACTION_VIEW);
+                 intent.setData(Uri.parse("market://details?id=x.org.server"));
+                 startActivity(intent);
+             }
+        	return true;
         case R.id.menu_delete:
             new AlertDialog.Builder(this).setMessage(R.string.confirm_delete_message)
                     .setCancelable(false).setPositiveButton(R.string.doit,
