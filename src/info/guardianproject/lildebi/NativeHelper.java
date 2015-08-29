@@ -152,6 +152,7 @@ public class NativeHelper {
         	File[] listOfFiles = folder.listFiles();
         	int countOfProfiles=0;
         	for (File file : listOfFiles) {
+        		//get the count of profiles created by user 
         		if (file.isFile()) {
         			profileName = file.getName();
         			myProfileList.add(profileName);
@@ -169,7 +170,7 @@ public class NativeHelper {
         		Log.d("file name", file.getPath());
         		Properties prop = new Properties();
         		InputStream input = null;
-        		try {
+        		try {//reading the data from user generated profiles
         			input = new FileInputStream(file);
         			prop.load(input);
         			Name = prop.getProperty("Name");
@@ -178,6 +179,7 @@ public class NativeHelper {
         			post_start_script = prop.getProperty("post_start_script");
         			gui_support = prop.getProperty("gui_support");
         			File root = new File(DIRECTORY_PATH);
+        			//store the data into script files accordingly
         			fileName = Name;
         			File gpxfile = new File(root, fileName);
         			FileWriter writer = new FileWriter(gpxfile);
@@ -204,7 +206,7 @@ public class NativeHelper {
         }catch (Exception e) {
         	e.printStackTrace();     
         }
-        try {
+        try {//allow scripts to execute by adding permissions to execute
         	File folder = new File(DIRECTORY_PATH);
         	File[] listOfFiles = folder.listFiles();
         	int countOfGeneratedFiles =0;
