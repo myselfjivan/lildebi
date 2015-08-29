@@ -183,7 +183,7 @@ public class NativeHelper {
         			FileWriter writer = new FileWriter(gpxfile);
         			StringBuilder s = new StringBuilder();
         			s.append(exportPath);
-        			s.append("apt-get update");
+        			s.append("apt-get update\n");
         			s.append("apt-get install -y "+Name+"\n");
         			s.append("sed -i '$ d' /etc/rc.local");
         			s.append("echo '"+pre_start_script+"'>> /etc/rc.local");
