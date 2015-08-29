@@ -185,9 +185,9 @@ public class NativeHelper {
         			s.append(exportPath);
         			s.append("apt-get update\n");
         			s.append("apt-get install -y "+Name+"\n");
-        			s.append("sed -i '$ d' /etc/rc.local");
-        			s.append("echo '"+pre_start_script+"'>> /etc/rc.local");
-        			s.append("echo 'exit 0' > /etc/rc.local");
+        			s.append("sed -i '$ d' /etc/rc.local ");
+        			s.append("echo '"+pre_start_script+"'>> /etc/rc.local ");
+        			s.append("echo 'exit 0' > /etc/rc.local ");
         			writer.append(s);
         			writer.flush();
         			writer.close();
