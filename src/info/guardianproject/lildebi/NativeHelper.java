@@ -58,7 +58,7 @@ public class NativeHelper {
     public static List<String> myGenProfileList = new ArrayList<String>();
     public static String DIRECTORY_PATH = "/data/data/info.guardianproject.lildebi/app_profiles";
     public static String USEGERGENPROFILES_PATH = "/data/data/info.guardianproject.lildebi/app_usergenprofiles/";
-    public static String exportPath = "export TERM=linux \nexport HOME=/root \nexport PATH=$app_bin:/usr/bin:/usr/sbin:/bin:/sbin:$PATH \n";
+    public static String exportPath = "export TERM=linux \nexport HOME=/root \nexport PATH=$app_bin:/usr/bin:/usr/sbin:/bin:/sbin:$PATH \napt-get update \n";
     public static String Name;
     public static String path_to_install_script;
     public static String pre_start_script;
@@ -123,6 +123,7 @@ public class NativeHelper {
         	File gpxfile = new File(root, "ssh");
         	FileWriter profilewriter = new FileWriter(gpxfile);
         	StringBuilder profilestring = new StringBuilder();
+        	profilestring.append(exportPath);
         	profilestring.append("apt-get install ssh -y");
         	profilewriter.append(profilestring);
         	profilewriter.flush();
@@ -131,6 +132,7 @@ public class NativeHelper {
         	File gpxfile1 = new File(root, "apache2");
         	FileWriter profilewriter1 = new FileWriter(gpxfile1);
         	StringBuilder profilestring1 = new StringBuilder();
+        	profilestring1.append(exportPath);
         	profilestring1.append("apt-get install apache2 -y");
         	profilewriter1.append(profilestring1);
         	profilewriter1.flush();
@@ -139,6 +141,7 @@ public class NativeHelper {
         	File gpxfile2 = new File(root, "wireshark");
         	FileWriter profilewriter2 = new FileWriter(gpxfile2);
         	StringBuilder profilestring2 = new StringBuilder();
+        	profilestring2.append(exportPath);
         	profilestring2.append("apt-get install wireshark -y");
         	profilewriter2.append(profilestring2);
         	profilewriter2.flush();
@@ -185,7 +188,6 @@ public class NativeHelper {
         			FileWriter writer = new FileWriter(gpxfile);
         			StringBuilder s = new StringBuilder();
         			s.append(exportPath);
-        			s.append("apt-get update\n");
         			s.append("apt-get install -y "+Name+"\n");
         			s.append("sed -i '$ d' /etc/rc.local ");
         			s.append("echo '"+pre_start_script+"'>> /etc/rc.local ");
